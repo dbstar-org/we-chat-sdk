@@ -17,7 +17,7 @@ public class WeChatResponseException extends ApiProtocolException {
      * @param errMsg  错误信息
      */
     public WeChatResponseException(final int errCode, final String errMsg) {
-        super(String.format("%d: %s\n", errCode, errMsg), null);
+        super(String.format("%d: %s", errCode, errMsg), null);
         this.statusCode = errCode;
         this.reasonPhrase = StringUtils.substringBefore(errMsg, RID_SPLIT_TOKEN);
         this.rid = StringUtils.substringAfter(errMsg, RID_SPLIT_TOKEN);
