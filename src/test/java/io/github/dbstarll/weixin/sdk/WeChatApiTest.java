@@ -13,6 +13,7 @@ import org.junit.jupiter.api.function.ThrowingConsumer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WeChatApiTest {
     private static final String TOKEN_KEY = "WE_CHAT_KEY";
@@ -104,6 +105,27 @@ class WeChatApiTest {
             final WeChatResponseException e = assertThrowsExactly(WeChatResponseException.class, () -> api.session(testAppId, "code"));
             assertEquals(40029, e.getStatusCode());
             assertEquals("invalid code,", e.getReasonPhrase());
+            assertNotNull(e.getRid());
+        }, secretHolder);
+    }
+
+    @Test
+    void phoneInvalidAccessToken() throws Throwable {
+        useApi(api -> {
+            final WeChatResponseException e = assertThrowsExactly(WeChatResponseException.class, () -> api.phone("accessToken", "code"));
+            assertEquals(40001, e.getStatusCode());
+            assertTrue(e.getReasonPhrase().startsWith("invalid credential, access_token is invalid or not latest"));
+            assertNotNull(e.getRid());
+        }, secretHolder);
+    }
+
+    @Test
+    void phoneInvalidCode() throws Throwable {
+        useApi(api -> {
+            final AccessTokenResponse response = api.accessToken(testAppId);
+            final WeChatResponseException e = assertThrowsExactly(WeChatResponseException.class, () -> api.phone(response.getAccessToken(), "code"));
+            assertEquals(40029, e.getStatusCode());
+            assertTrue(e.getReasonPhrase().startsWith("invalid code"));
             assertNotNull(e.getRid());
         }, secretHolder);
     }
