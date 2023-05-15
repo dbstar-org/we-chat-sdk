@@ -1,6 +1,7 @@
 package io.github.dbstarll.weixin.sdk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.dbstarll.utils.http.client.request.RelativeUriResolver;
 import io.github.dbstarll.utils.json.jackson.JsonApiClient;
@@ -21,13 +22,17 @@ public class WeChatApi extends JsonApiClient {
      * 构造WeChatApi.
      *
      * @param httpClient   httpClient
-     * @param objectMapper objectMapper
+     * @param mapper       mapper
      * @param secretHolder SecretHolder
      */
-    public WeChatApi(final HttpClient httpClient, final ObjectMapper objectMapper, final SecretHolder secretHolder) {
-        super(httpClient, true, objectMapper);
+    public WeChatApi(final HttpClient httpClient, final ObjectMapper mapper, final SecretHolder secretHolder) {
+        super(httpClient, true, optimize(mapper.copy()));
         this.secretHolder = notNull(secretHolder, "secretHolder not set");
         setUriResolver(new RelativeUriResolver("https://api.weixin.qq.com"));
+    }
+
+    private static ObjectMapper optimize(final ObjectMapper mapper) {
+        return mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
 
     @Override
@@ -59,16 +64,16 @@ public class WeChatApi extends JsonApiClient {
     }
 
     /**
-     * 获取小程序全局唯一后台接口调用凭据，token有效期为7200s，开发者需要进行妥善保存.
+     * 获取小程序全局唯一后台接口调用凭据，开发者需要进行妥善保存.
      *
      * @param appId 小程序唯一凭证，即 AppID，可在「微信公众平台 - 设置 - 开发设置」页中获得
-     * @return 接口调用凭据
+     * @return AccessTokenResponse
      * @throws IOException  in case of a problem or the connection was aborted
      * @throws ApiException in case of an api error
      */
-    public ObjectNode accessToken(final String appId) throws IOException, ApiException {
+    public AccessTokenResponse accessToken(final String appId) throws IOException, ApiException {
         return execute(auth(get("/cgi-bin/token")
-                .addParameter("grant_type", "client_credential"), appId), ObjectNode.class);
+                .addParameter("grant_type", "client_credential"), appId), AccessTokenResponse.class);
     }
 
     private ClassicHttpRequest auth(final ClassicRequestBuilder builder, final String appId) {
