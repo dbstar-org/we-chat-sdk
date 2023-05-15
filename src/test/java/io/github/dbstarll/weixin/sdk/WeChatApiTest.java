@@ -97,4 +97,14 @@ class WeChatApiTest {
             assertNotNull(e.getRid());
         }, appId -> "secret");
     }
+
+    @Test
+    void sessionInvalidCode() throws Throwable {
+        useApi(api -> {
+            final WeChatResponseException e = assertThrowsExactly(WeChatResponseException.class, () -> api.session(testAppId, "code"));
+            assertEquals(40029, e.getStatusCode());
+            assertEquals("invalid code,", e.getReasonPhrase());
+            assertNotNull(e.getRid());
+        }, secretHolder);
+    }
 }

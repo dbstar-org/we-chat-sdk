@@ -16,12 +16,7 @@ public final class AccessTokenResponse implements Serializable {
         return accessToken;
     }
 
-    /**
-     * 设置获取到的凭证.
-     *
-     * @param accessToken 获取到的凭证
-     */
-    public void setAccessToken(final String accessToken) {
+    void setAccessToken(final String accessToken) {
         this.accessToken = accessToken;
     }
 
@@ -34,12 +29,7 @@ public final class AccessTokenResponse implements Serializable {
         return expiresIn;
     }
 
-    /**
-     * 设置凭证有效时间，单位：秒.
-     *
-     * @param expiresIn 凭证有效时间
-     */
-    public void setExpiresIn(final int expiresIn) {
+    void setExpiresIn(final int expiresIn) {
         this.expiresIn = expiresIn;
     }
 

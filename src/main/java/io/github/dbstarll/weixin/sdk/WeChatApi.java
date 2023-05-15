@@ -53,14 +53,14 @@ public class WeChatApi extends JsonApiClient {
      *
      * @param appId 小程序 appId
      * @param code  登录时获取的 code
-     * @return 登录凭证
+     * @return SessionResponse
      * @throws IOException  in case of a problem or the connection was aborted
      * @throws ApiException in case of an api error
      */
-    public ObjectNode session(final String appId, final String code) throws IOException, ApiException {
+    public SessionResponse session(final String appId, final String code) throws IOException, ApiException {
         return execute(auth(post("/sns/jscode2session")
                 .addParameter("grant_type", "authorization_code")
-                .addParameter("js_code", notBlank(code, "code not set")), appId), ObjectNode.class);
+                .addParameter("js_code", notBlank(code, "code not set")), appId), SessionResponse.class);
     }
 
     /**
