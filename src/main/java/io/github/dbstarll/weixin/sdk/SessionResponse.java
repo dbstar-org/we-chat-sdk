@@ -1,8 +1,11 @@
 package io.github.dbstarll.weixin.sdk;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 import java.util.StringJoiner;
 
+@JsonIgnoreProperties({"errcode", "errmsg"})
 public final class SessionResponse implements Serializable {
     private String sessionKey;
     private String unionid;
