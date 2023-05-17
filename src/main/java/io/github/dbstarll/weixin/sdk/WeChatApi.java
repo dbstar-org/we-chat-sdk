@@ -2,6 +2,7 @@ package io.github.dbstarll.weixin.sdk;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -39,7 +40,8 @@ public class WeChatApi extends JsonApiClient {
     private static ObjectMapper optimize(final ObjectMapper mapper) {
         return mapper
                 .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(Include.NON_NULL);
+                .setSerializationInclusion(Include.NON_NULL)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     @Override
