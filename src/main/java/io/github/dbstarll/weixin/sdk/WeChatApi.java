@@ -88,14 +88,14 @@ public class WeChatApi extends JsonApiClient {
      *
      * @param accessToken 接口调用凭证
      * @param code        手机号获取凭证
-     * @return ObjectNode
+     * @return UserPhoneResponse
      * @throws IOException  in case of a problem or the connection was aborted
      * @throws ApiException in case of an api error
      */
-    public ObjectNode phone(final String accessToken, final String code) throws IOException, ApiException {
+    public UserPhoneResponse phone(final String accessToken, final String code) throws IOException, ApiException {
         return execute(authByAccessToken(post("/wxa/business/getuserphonenumber")
                         .setEntity(jsonEntity(new CodeRequest(notBlank(code, "code not set")))),
-                accessToken), ObjectNode.class);
+                accessToken), UserPhoneResponse.class);
     }
 
     private <T> HttpEntity jsonEntity(final T request) throws JsonProcessingException {
