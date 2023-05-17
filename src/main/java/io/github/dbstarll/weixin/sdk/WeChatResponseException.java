@@ -3,8 +3,10 @@ package io.github.dbstarll.weixin.sdk;
 import io.github.dbstarll.utils.net.api.ApiProtocolException;
 import org.apache.commons.lang3.StringUtils;
 
+import static org.apache.commons.lang3.Validate.notBlank;
+
 public class WeChatResponseException extends ApiProtocolException {
-    private static final String RID_SPLIT_TOKEN = " rid: ";
+    private static final String RID_SPLIT_TOKEN = "rid:";
 
     private final int statusCode;
     private final String reasonPhrase;
@@ -17,10 +19,16 @@ public class WeChatResponseException extends ApiProtocolException {
      * @param errMsg  错误信息
      */
     public WeChatResponseException(final int errCode, final String errMsg) {
-        super(String.format("%d: %s", errCode, errMsg), null);
+        super(String.format("%d: %s", errCode, notBlank(errMsg, "errMsg not set")), null);
         this.statusCode = errCode;
-        this.reasonPhrase = StringUtils.substringBefore(errMsg, RID_SPLIT_TOKEN);
-        this.rid = StringUtils.substringAfter(errMsg, RID_SPLIT_TOKEN);
+        final int index = errMsg.lastIndexOf(RID_SPLIT_TOKEN);
+        if (index < 0) {
+            this.reasonPhrase = errMsg;
+            this.rid = null;
+        } else {
+            this.reasonPhrase = StringUtils.removeEnd(errMsg.substring(0, index).trim(), ",");
+            this.rid = errMsg.substring(index + RID_SPLIT_TOKEN.length()).trim();
+        }
     }
 
     /**
