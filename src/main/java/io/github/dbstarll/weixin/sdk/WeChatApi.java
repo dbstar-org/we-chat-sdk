@@ -108,7 +108,7 @@ public class WeChatApi extends JsonApiClient {
     private ClassicHttpRequest authByAppId(final ClassicRequestBuilder builder, final String appId) {
         return builder
                 .addParameter("appid", notBlank(appId, "appId not set"))
-                .addParameter("secret", notBlank(secretHolder.getSecret(appId), "secret not found for {}", appId))
+                .addParameter("secret", notBlank(secretHolder.getSecret(appId), "secret not found for %s", appId))
                 .build();
     }
 

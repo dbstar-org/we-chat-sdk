@@ -100,6 +100,14 @@ class WeChatApiTest {
     }
 
     @Test
+    void accessTokenSecretNotFound() throws Throwable {
+        useApi(api -> {
+            final NullPointerException e = assertThrowsExactly(NullPointerException.class, () -> api.accessToken("appId"));
+            assertEquals("secret not found for appId", e.getMessage());
+        }, appId -> null);
+    }
+
+    @Test
     void sessionInvalidCode() throws Throwable {
         useApi(api -> {
             final WeChatResponseException e = assertThrowsExactly(WeChatResponseException.class, () -> api.session(testAppId, "code"));
