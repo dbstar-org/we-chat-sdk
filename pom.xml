@@ -8,7 +8,7 @@
   </parent>
   <groupId>io.github.dbstarll</groupId>
   <artifactId>weixin-sdk</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.2-SNAPSHOT</version>
 
   <name>weixin-sdk</name>
   <description>WeiXin SDK</description>
