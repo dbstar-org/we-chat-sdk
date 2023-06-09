@@ -21,7 +21,7 @@ import java.io.IOException;
 import static org.apache.commons.lang3.Validate.notBlank;
 import static org.apache.commons.lang3.Validate.notNull;
 
-public class WeChatApi extends JsonApiClient {
+public final class WeChatApi extends JsonApiClient {
     private final SecretHolder secretHolder;
 
     /**
