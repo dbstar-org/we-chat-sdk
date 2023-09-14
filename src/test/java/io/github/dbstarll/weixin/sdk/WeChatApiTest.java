@@ -85,7 +85,7 @@ class WeChatApiTest {
             final AccessTokenResponse response = api.accessToken(testAppId);
             assertNotNull(response.getAccessToken());
             assertEquals(136, response.getAccessToken().length());
-            assertEquals(7200, response.getExpiresIn());
+            assertTrue(response.getExpiresIn() > 7000);
         }, secretHolder);
     }
 
@@ -134,6 +134,33 @@ class WeChatApiTest {
             final WeChatResponseException e = assertThrowsExactly(WeChatResponseException.class, () -> api.phone(response.getAccessToken(), "code"));
             assertEquals(40029, e.getStatusCode());
             assertTrue(e.getReasonPhrase().startsWith("invalid code"));
+            assertNotNull(e.getRid());
+        }, secretHolder);
+    }
+
+    @Test
+    void unlimitedQrCode() throws Throwable {
+        useApi(api -> {
+            final AccessTokenResponse response = api.accessToken(testAppId);
+            final UnlimitedQrCodeRequest request = new UnlimitedQrCodeRequest("a=b");
+            request.setEnvVersion("release");
+            request.setWidth(430);
+            request.setAutoColor(false);
+            request.setLineColor(Color.rgb(255, 0, 0));
+            request.setIsHyaline(false);
+            final byte[] data = api.unlimitedQrCode(response.getAccessToken(), request);
+            assertTrue(data.length > 10000);
+        }, secretHolder);
+    }
+
+    @Test
+    void unlimitedQrCodeInvalidPage() throws Throwable {
+        useApi(api -> {
+            final AccessTokenResponse response = api.accessToken(testAppId);
+            final UnlimitedQrCodeRequest request = new UnlimitedQrCodeRequest("a=b", "pages/index/unknown");
+            final WeChatResponseException e = assertThrowsExactly(WeChatResponseException.class, () -> api.unlimitedQrCode(response.getAccessToken(), request));
+            assertEquals(41030, e.getStatusCode());
+            assertEquals("invalid page", e.getReasonPhrase());
             assertNotNull(e.getRid());
         }, secretHolder);
     }

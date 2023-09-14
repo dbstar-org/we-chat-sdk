@@ -10,13 +10,11 @@ import io.github.dbstarll.utils.http.client.request.RelativeUriResolver;
 import io.github.dbstarll.utils.json.jackson.JsonApiClient;
 import io.github.dbstarll.utils.net.api.ApiException;
 import org.apache.hc.client5.http.classic.HttpClient;
-import org.apache.hc.client5.http.entity.EntityBuilder;
 import org.apache.hc.core5.http.ClassicHttpRequest;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.apache.commons.lang3.Validate.notBlank;
 import static org.apache.commons.lang3.Validate.notNull;
@@ -47,8 +45,16 @@ public final class WeChatApi extends JsonApiClient {
     @Override
     protected <T> T postProcessing(final ClassicHttpRequest request, final T executeResult) throws ApiException {
         final T superResult = super.postProcessing(request, executeResult);
-        if (superResult instanceof ObjectNode) {
-            final ObjectNode node = (ObjectNode) superResult;
+        Object copyResult = superResult;
+        if (copyResult instanceof byte[]) {
+            try {
+                copyResult = mapper.readTree(new String((byte[]) copyResult, StandardCharsets.UTF_8));
+            } catch (JsonProcessingException e) {
+                // 不是json字符串
+            }
+        }
+        if (copyResult instanceof ObjectNode) {
+            final ObjectNode node = (ObjectNode) copyResult;
             final int errcode = node.path("errcode").asInt(0);
             if (errcode != 0) {
                 throw new WeChatResponseException(errcode, node.path("errmsg").asText());
@@ -100,9 +106,20 @@ public final class WeChatApi extends JsonApiClient {
                 accessToken), UserPhoneResponse.class);
     }
 
-    private <T> HttpEntity jsonEntity(final T request) throws JsonProcessingException {
-        return EntityBuilder.create().setText(mapper.writeValueAsString(request))
-                .setContentType(ContentType.APPLICATION_JSON).setContentEncoding("UTF-8").build();
+    /**
+     * 该接口用于获取小程序码，适用于需要的码数量极多的业务场景。通过该接口生成的小程序码，永久有效，数量暂无限制.
+     *
+     * @param accessToken 接口调用凭证
+     * @param request     请求参数
+     * @return 图片二进制
+     * @throws IOException  in case of a problem or the connection was aborted
+     * @throws ApiException in case of an api error
+     */
+    public byte[] unlimitedQrCode(final String accessToken, final UnlimitedQrCodeRequest request)
+            throws IOException, ApiException {
+        return execute(authByAccessToken(post("/wxa/getwxacodeunlimit")
+                        .setEntity(jsonEntity(notNull(request, "request not set"))),
+                accessToken), byte[].class);
     }
 
     private ClassicHttpRequest authByAppId(final ClassicRequestBuilder builder, final String appId) {
