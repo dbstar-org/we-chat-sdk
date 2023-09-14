@@ -1,4 +1,4 @@
-package io.github.dbstarll.weixin.sdk;
+package io.github.dbstarll.weixin.sdk.request;
 
 import java.io.Serializable;
 

@@ -9,6 +9,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.dbstarll.utils.http.client.request.RelativeUriResolver;
 import io.github.dbstarll.utils.json.jackson.JsonApiClient;
 import io.github.dbstarll.utils.net.api.ApiException;
+import io.github.dbstarll.weixin.sdk.request.CodeRequest;
+import io.github.dbstarll.weixin.sdk.request.GenerateUrlLinkRequest;
+import io.github.dbstarll.weixin.sdk.request.UnlimitedQrCodeRequest;
+import io.github.dbstarll.weixin.sdk.response.GenerateUrlLinkResponse;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
@@ -120,6 +124,22 @@ public final class WeChatApi extends JsonApiClient {
         return execute(authByAccessToken(post("/wxa/getwxacodeunlimit")
                         .setEntity(jsonEntity(notNull(request, "request not set"))),
                 accessToken), byte[].class);
+    }
+
+    /**
+     * 获取小程序 URL Link，适用于短信、邮件、网页、微信内等拉起小程序的业务场景。目前仅针对国内非个人主体的小程序开放.
+     *
+     * @param accessToken 接口调用凭证
+     * @param request     请求参数
+     * @return 生成的小程序 URL Link
+     * @throws IOException  in case of a problem or the connection was aborted
+     * @throws ApiException in case of an api error
+     */
+    public String generateUrlLink(final String accessToken, final GenerateUrlLinkRequest request)
+            throws IOException, ApiException {
+        return execute(authByAccessToken(post("/wxa/generate_urllink")
+                        .setEntity(jsonEntity(notNull(request, "request not set"))),
+                accessToken), GenerateUrlLinkResponse.class).getUrlLink();
     }
 
     private ClassicHttpRequest authByAppId(final ClassicRequestBuilder builder, final String appId) {

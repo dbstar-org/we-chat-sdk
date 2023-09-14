@@ -1,4 +1,4 @@
-package io.github.dbstarll.weixin.sdk;
+package io.github.dbstarll.weixin.sdk.request;
 
 import java.io.Serializable;
 
@@ -6,7 +6,7 @@ import static org.apache.commons.lang3.Validate.notBlank;
 
 public final class UnlimitedQrCodeRequest implements Serializable {
     /**
-     * 最大32个可见字符，只支持数字，大小写英文以及部分特殊字符：!#$&'()*+,/:;=?@-._~，
+     * 最大32个可见字符，只支持数字，大小写英文以及部分特殊字符：<span>!#$&nbsp;'()*+,/:;=?@-._~</span>，
      * 其它字符请自行编码为合法字符（因不支持%，中文无法使用 urlencode 处理，请使用其他编码方式）.
      */
     private final String scene;

@@ -2,6 +2,10 @@ package io.github.dbstarll.weixin.sdk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.dbstarll.utils.http.client.HttpClientFactory;
+import io.github.dbstarll.weixin.sdk.request.CloudBase;
+import io.github.dbstarll.weixin.sdk.request.Color;
+import io.github.dbstarll.weixin.sdk.request.GenerateUrlLinkRequest;
+import io.github.dbstarll.weixin.sdk.request.UnlimitedQrCodeRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -161,6 +165,36 @@ class WeChatApiTest {
             final WeChatResponseException e = assertThrowsExactly(WeChatResponseException.class, () -> api.unlimitedQrCode(response.getAccessToken(), request));
             assertEquals(41030, e.getStatusCode());
             assertEquals("invalid page", e.getReasonPhrase());
+            assertNotNull(e.getRid());
+        }, secretHolder);
+    }
+
+    @Test
+    void generateUrlLink() throws Throwable {
+        useApi(api -> {
+            final GenerateUrlLinkRequest request = new GenerateUrlLinkRequest("pages/home/index", "a=b");
+            request.setExpireInterval(1);
+            request.setEnvVersion("release");
+            final String link = api.generateUrlLink("72_r8liXqV69YuZEVjmpgczW54HpoHC7e1-1P67HadW8fEf5PJQ1gyiGzuVpzIhDLnIgRqAsRsrMcSuWCquSPyxcoYesChvFXqSt07OTNir4iuriJcXgcyj0XvT4dINXObAHAXHY", request);
+            assertTrue(link.startsWith("https://wxaurl.cn/"));
+        }, secretHolder);
+    }
+
+    @Test
+    void generateUrlLinkInvalidGrantType() throws Throwable {
+        useApi(api -> {
+            final AccessTokenResponse response = api.accessToken(testAppId);
+            final GenerateUrlLinkRequest request = new GenerateUrlLinkRequest();
+            request.setExpireTime(System.currentTimeMillis());
+            final CloudBase cloudBase = new CloudBase("release");
+            cloudBase.setDomain("qq.com");
+            cloudBase.setPath("/abc");
+            cloudBase.setQuery("a=b");
+            cloudBase.setResourceAppid("appId");
+            request.setCloudBase(cloudBase);
+            final WeChatResponseException e = assertThrowsExactly(WeChatResponseException.class, () -> api.generateUrlLink(response.getAccessToken(), request));
+            assertEquals(40002, e.getStatusCode());
+            assertEquals("invalid grant_type", e.getReasonPhrase());
             assertNotNull(e.getRid());
         }, secretHolder);
     }
